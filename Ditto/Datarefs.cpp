@@ -30,7 +30,6 @@ std::vector<uint8_t> dataref::get_serialized_data() {
 			}
 			else if (dataref_type == "float") {
 				fbb.Float(dataref_name.c_str(), dataref::get_value_float(std::get<1>(dataref)));
-				XPLMDebugString((dataref_name.c_str() + std::to_string(dataref::get_value_float(std::get<1>(dataref))) + "\n").c_str());
 			}
 			else if (dataref_type == "double") {
 				fbb.Double(dataref_name.c_str(), dataref::get_value_double(std::get<1>(dataref)));
