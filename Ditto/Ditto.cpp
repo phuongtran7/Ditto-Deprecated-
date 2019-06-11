@@ -49,6 +49,7 @@ PLUGIN_API int XPluginStart(
 
 	//Register to get callback every frame
 	XPLMRegisterFlightLoopCallback(listenCallback, -1.0, nullptr);
+	XPLMDebugString("Starting Ditto.\n");
 
 	return 1;
 }
@@ -56,17 +57,23 @@ PLUGIN_API int XPluginStart(
 PLUGIN_API void	XPluginStop(void)
 {
 	/* Unregister the callback */
+	new_data.empty_list();
 	XPLMUnregisterFlightLoopCallback(listenCallback, nullptr);
+	new_socket.
+	XPLMDebugString("Stopping Ditto.\n");
 }
 
 PLUGIN_API void XPluginDisable(void) {
 	new_data.empty_list();
+	XPLMUnregisterFlightLoopCallback(listenCallback, nullptr);
+	XPLMDebugString("Disabling Ditto.\n");
 }
 PLUGIN_API int  XPluginEnable(void)  {
 	if (!new_data.get_status()) {
 		new_data.init();
 		XPLMRegisterFlightLoopCallback(listenCallback, -1.0, nullptr);
 	}
+	XPLMDebugString("Enabling Ditto.\n");
 	return 1;
 }
 PLUGIN_API void XPluginReceiveMessage(XPLMPluginID inFrom, int inMsg, void * inParam) { }
