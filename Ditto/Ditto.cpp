@@ -65,6 +65,7 @@ PLUGIN_API void XPluginDisable(void) {
 PLUGIN_API int  XPluginEnable(void)  {
 	if (!new_data.get_status()) {
 		new_data.init();
+		XPLMRegisterFlightLoopCallback(listenCallback, -1.0, nullptr);
 	}
 	return 1;
 }
