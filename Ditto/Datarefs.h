@@ -9,13 +9,13 @@
 class dataref {
 private:
 	struct dataref_info {
-		std::string name;
-		XPLMDataRef dataref;
-		std::string type;
-		std::optional<unsigned int> start_index; // Starting index of the dataref array. May not be present in case of single value dataref.
-		std::optional<unsigned int> end_index;
+		std::string name{};
+		XPLMDataRef dataref{};
+		std::string type{};
+		std::optional<int> start_index{};
+		std::optional<int> num_value{}; // Number of values in the array to get starts at start_index
 	};
-	// Name, dataref, type, max range
+
 	std::vector<dataref_info> dataref_list;
 	std::vector<dataref_info> get_list();
 	void initialize_list();

@@ -28,4 +28,4 @@ name = "N2_Percent"
 string = "sim/cockpit2/engine/indicators/N2_percent"
 type = "float"
 start_index = 0
-end_index = 2
+num_value = 1
