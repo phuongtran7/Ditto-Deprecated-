@@ -59,6 +59,7 @@ PLUGIN_API void	XPluginStop(void)
 	/* Unregister the callback */
 	new_data.empty_list();
 	XPLMUnregisterFlightLoopCallback(listenCallback, nullptr);
+	new_socket.shutdown();
 	XPLMDebugString("Stopping Ditto.\n");
 }
 

@@ -42,6 +42,11 @@ public:
 			return 0;
 		}
 	}
+	
+	void shutdown() {
+		socket_.shutdown(boost::asio::ip::udp::socket::shutdown_both);
+		socket_.close();
+	}
 private:
 	udp::socket socket_;
 	std::map<std::string, udp::endpoint> endpoints_;

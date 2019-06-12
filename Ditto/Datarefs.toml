@@ -2,34 +2,30 @@
 name = "Airspeed"
 string = "sim/flightmodel/position/indicated_airspeed"
 type = "float"
-max_range = 1
 
 [[Data]]
 name = "Latitude"
 string = "sim/flightmodel/position/latitude"
 type = "float"
-max_range = 1
 
 [[Data]]
 name = "Longitude"
 string = "sim/flightmodel/position/longitude"
 type = "float"
-max_range = 1
 
 [[Data]]
 name = "Altitude"
 string = "sim/cockpit2/gauges/indicators/altitude_ft_pilot"
 type = "float"
-max_range = 1
-
-[[Data]]
-name = "Vertical_Speed"
-string = "sim/flightmodel/position/vh_ind_fpm"
-type = "float"
-max_range = 1
 
 [[Data]]
 name = "Heading"
 string = "sim/flightmodel/position/mag_psi"
 type = "float"
-max_range = 1
+
+[[Data]]
+name = "N2_Percent"
+string = "sim/cockpit2/engine/indicators/N2_percent"
+type = "float"
+start_index = 0
+end_index = 2
