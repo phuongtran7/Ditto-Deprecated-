@@ -56,7 +56,6 @@ std::vector<uint8_t> dataref::get_serialized_data() {
 	}
 
 	fbb.EndMap(map_start);
-
 	fbb.Finish();
 
 	return fbb.GetBuffer();
@@ -130,6 +129,7 @@ std::vector<int> dataref::get_value_int_array(XPLMDataRef inDataref, int start_i
 	}
 	return return_val;
 }
+
 std::vector<float> dataref::get_value_float_array(XPLMDataRef inDataref, int start_index, int number_of_value) {
 	std::vector<float> return_val;
 
@@ -141,6 +141,7 @@ std::vector<float> dataref::get_value_float_array(XPLMDataRef inDataref, int sta
 	}
 	return return_val;
 }
+
 std::vector<char> dataref::get_value_char_array(XPLMDataRef inDataref, int start_index, int number_of_value) {
 	std::vector<char> return_val;
 
