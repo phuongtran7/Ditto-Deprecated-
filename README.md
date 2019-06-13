@@ -3,7 +3,7 @@
 
 Ditto is an X-Plane plugin that allows the user to pause the simulator in a specific scenario to add/remove or swap the datarefs that Ditto is sending the values out. Ditto will allow faster iteration in plugin developments and multi-language on the receiver side.
 
-Ditto uses <a href="https://google.github.io/flatbuffers/flexbuffers.html">Flexbuffers</a>, <a href="https://github.com/skystrife/cpptoml">cpptoml</a> and <a href="https://developer.x-plane.com/sdk/">X-Plane SDK</a>.
+Ditto uses <a href="https://google.github.io/flatbuffers/flexbuffers.html">Flexbuffers</a>, <a href="https://github.com/skystrife/cpptoml">cpptoml</a>, <a href="https://developer.x-plane.com/sdk/">X-Plane SDK</a> and <a href="http://boost.org/libs/asio">Boost Asio</a>.
 
 ## Installation
 ### Windows
