@@ -43,7 +43,6 @@ std::vector<uint8_t> dataref::get_serialized_data() {
 			}
 			else if (dataref.type == "float") {
 				for (auto float_num : dataref::get_value_float_array(dataref.dataref, dataref.start_index.value(), dataref.num_value.value())) {
-					XPLMDebugString(("Float dataref " + dataref.name + " : " + std::to_string(float_num) + "\n").c_str());
 					fbb.Float(float_num);
 				}
 			}
@@ -51,7 +50,7 @@ std::vector<uint8_t> dataref::get_serialized_data() {
 				auto str = dataref::get_value_char_array(dataref.dataref, dataref.start_index.value(), dataref.num_value.value());
 				fbb.String(std::string(str.begin(), str.end()));
 			}
-			fbb.EndVector(vector_start, true, true);
+			fbb.EndVector(vector_start, false, false);
 		}
 	}
 
@@ -125,7 +124,7 @@ std::vector<int> dataref::get_value_int_array(XPLMDataRef inDataref, int start_i
 	for (auto i = 1; i <= number_of_value; ++i) {
 		int temp;
 		XPLMGetDatavi(inDataref, &temp, start_index, 1);
-		return_val.push_back(temp);
+		return_val.emplace_back(temp);
 	}
 	return return_val;
 }
@@ -136,8 +135,7 @@ std::vector<float> dataref::get_value_float_array(XPLMDataRef inDataref, int sta
 	for (auto i = 1; i <= number_of_value; ++i) {
 		float temp;
 		XPLMGetDatavf(inDataref, &temp, start_index, 1);
-		return_val.push_back(temp);
-		XPLMDebugString(("Got float at " + std::to_string(i) + " : " + std::to_string(temp) + "\n").c_str());
+		return_val.emplace_back(temp);
 	}
 	return return_val;
 }
@@ -148,7 +146,7 @@ std::vector<char> dataref::get_value_char_array(XPLMDataRef inDataref, int start
 	for (auto i = 1; i <= number_of_value; ++i) {
 		float temp;
 		XPLMGetDatab(inDataref, &temp, start_index, 1);
-		return_val.push_back(temp);
+		return_val.emplace_back(temp);
 	}
 	return return_val;
 }

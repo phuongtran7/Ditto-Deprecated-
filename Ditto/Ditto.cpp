@@ -88,6 +88,14 @@ float listenCallback(float inElapsedSinceLastCall,
 	auto size = new_data.get_serialized_size();
 	new_socket.send_data(reinterpret_cast<char*>(&out_data[0]), size, "Pylon");
 
+	// Test
+	auto root = flexbuffers::GetRoot(out_data).AsMap();
+	auto vec = root["N2_Percent"].AsVector();
+
+	XPLMDebugString(("Vector size: " + std::to_string(vec.size()) + "\n").c_str());
+	XPLMDebugString(("N2_Percent[0]: " + std::to_string(vec[0].AsFloat()) + "\n").c_str());
+	XPLMDebugString(("N2_Percent[1]: " + std::to_string(vec[1].AsFloat()) + "\n").c_str());
+
 	new_data.reset_builder();
 
 	return -1.0;
