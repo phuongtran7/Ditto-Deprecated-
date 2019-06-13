@@ -23,12 +23,12 @@ static float	listenCallback(
 	float                inElapsedSinceLastCall,
 	float                inElapsedTimeSinceLastFlightLoop,
 	int                  inCounter,
-	void *               inRefcon);
+	void* inRefcon);
 
 PLUGIN_API int XPluginStart(
-	char *		outName,
-	char *		outSig,
-	char *		outDesc)
+	char* outName,
+	char* outSig,
+	char* outDesc)
 {
 	strcpy_s(outName, 13, "Ditto");
 	strcpy_s(outSig, 21, "phuong.x-plane.ditto");
@@ -68,7 +68,7 @@ PLUGIN_API void XPluginDisable(void) {
 	XPLMUnregisterFlightLoopCallback(listenCallback, nullptr);
 	XPLMDebugString("Disabling Ditto.\n");
 }
-PLUGIN_API int  XPluginEnable(void)  {
+PLUGIN_API int  XPluginEnable(void) {
 	if (!new_data.get_status()) {
 		new_data.init();
 		XPLMRegisterFlightLoopCallback(listenCallback, -1.0, nullptr);
@@ -76,25 +76,16 @@ PLUGIN_API int  XPluginEnable(void)  {
 	XPLMDebugString("Enabling Ditto.\n");
 	return 1;
 }
-PLUGIN_API void XPluginReceiveMessage(XPLMPluginID inFrom, int inMsg, void * inParam) { }
+PLUGIN_API void XPluginReceiveMessage(XPLMPluginID inFrom, int inMsg, void* inParam) { }
 
 float listenCallback(float inElapsedSinceLastCall,
 	float inElapsedTimeSinceLastFlightLoop,
 	int inCounter,
 	void* inRefcon)
 {
-
 	auto out_data = new_data.get_serialized_data();
 	auto size = new_data.get_serialized_size();
 	new_socket.send_data(reinterpret_cast<char*>(&out_data[0]), size, "Pylon");
-
-	// Test
-	auto root = flexbuffers::GetRoot(out_data).AsMap();
-	auto vec = root["N2_Percent"].AsVector();
-
-	XPLMDebugString(("Vector size: " + std::to_string(vec.size()) + "\n").c_str());
-	XPLMDebugString(("N2_Percent[0]: " + std::to_string(vec[0].AsFloat()) + "\n").c_str());
-	XPLMDebugString(("N2_Percent[1]: " + std::to_string(vec[1].AsFloat()) + "\n").c_str());
 
 	new_data.reset_builder();
 
