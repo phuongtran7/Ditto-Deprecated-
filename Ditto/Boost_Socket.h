@@ -27,7 +27,7 @@ public:
 	}
 
 	// Send the data to the endpoint that matches the referenced ID string
-	size_t send_data(char * send_buf, const int size, const std::string& endpoint)
+	size_t send_data(char * send_buf, const size_t size, const std::string& endpoint)
 	{
 		try
 		{
