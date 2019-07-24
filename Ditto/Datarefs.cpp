@@ -25,7 +25,9 @@ uint8_t* dataref::get_serialized_data()
 	Ditto::DataBuilder data_builder(flatbuffers_builder);
 	data_builder.add_size(size);
 	data_builder.add_buffer(data);
-	data_builder.Finish();
+	const auto finished = data_builder.Finish();
+
+	flatbuffers_builder.Finish(finished);
 
 	return flatbuffers_builder.GetBufferPointer();
 }
@@ -80,11 +82,11 @@ std::vector<uint8_t> dataref::get_flexbuffers_data() {
 }
 
 bool dataref::get_status() {
-	return dataref::status;
+	return status;
 }
 
 void dataref::set_status(bool in_status) {
-	dataref::status = in_status;
+	status = in_status;
 }
 
 size_t dataref::get_flexbuffers_size() {
