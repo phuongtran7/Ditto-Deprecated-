@@ -19,13 +19,12 @@ void dataref::empty_list() {
 
 uint8_t* dataref::get_serialized_data()
 {
-	Ditto::DataBuilder data_builder(flatbuffers_builder);
 	const auto data = flatbuffers_builder.CreateVector(get_flexbuffers_data());
 	const auto size = get_flexbuffers_size();
 
+	Ditto::DataBuilder data_builder(flatbuffers_builder);
 	data_builder.add_size(size);
 	data_builder.add_buffer(data);
-
 	data_builder.Finish();
 
 	return flatbuffers_builder.GetBufferPointer();
