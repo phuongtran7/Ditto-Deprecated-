@@ -7,13 +7,8 @@
 // Solution: define NOMINMAX in preprocessor
 
 #include "Boost_Socket.h"
-#include "XPLMDataAccess.h"
 #include "XPLMProcessing.h"
 #include "Datarefs.h"
-
-#ifndef XPLM300
-#error This is made to be compiled against the XPLM300 SDK
-#endif
 
 boost::asio::io_context io_context;
 boost_socket new_socket(io_context);
@@ -83,9 +78,16 @@ float listenCallback(float inElapsedSinceLastCall,
 	int inCounter,
 	void* inRefcon)
 {
-	auto out_data = new_data.get_serialized_data();
-	auto size = new_data.get_serialized_size();
-	new_socket.send_data(reinterpret_cast<char*>(&out_data[0]), size, "Pylon");
+	const auto out_data = new_data.get_serialized_data();
+	const auto size = new_data.get_serialized_size();
+
+	auto verifier = flatbuffers::Verifier(out_data, size);
+	if (Ditto::VerifyDataBuffer(verifier)) {
+		new_socket.send_data(reinterpret_cast<char*>(&out_data[0]), size, "Pylon");
+	}
+	else {
+		XPLMDebugString("Flatbuffers verifier failed.\n");
+	}
 
 	new_data.reset_builder();
 

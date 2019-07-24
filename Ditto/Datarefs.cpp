@@ -6,7 +6,8 @@ std::vector<dataref::dataref_info> dataref::get_list()
 }
 
 void dataref::reset_builder() {
-	fbb.Clear();
+	flexbuffers_builder.Clear();
+	flatbuffers_builder.Clear();
 }
 
 // Remove all the dataref in the dataref list
@@ -16,79 +17,96 @@ void dataref::empty_list() {
 	set_status(false);
 }
 
-std::vector<uint8_t> dataref::get_serialized_data() {
+uint8_t* dataref::get_serialized_data()
+{
+	Ditto::DataBuilder data_builder(flatbuffers_builder);
+	const auto data = flatbuffers_builder.CreateVector(get_flexbuffers_data());
+	const auto size = get_flexbuffers_size();
 
-	auto map_start = fbb.StartMap();
+	data_builder.add_size(size);
+	data_builder.add_buffer(data);
 
-	for (auto& dataref : dataref::dataref_list) {
+	data_builder.Finish();
+
+	return flatbuffers_builder.GetBufferPointer();
+}
+
+size_t dataref::get_serialized_size()
+{
+	return flatbuffers_builder.GetSize();
+}
+
+std::vector<uint8_t> dataref::get_flexbuffers_data() {
+
+	const auto map_start = flexbuffers_builder.StartMap();
+
+	for (auto& dataref : dataref_list) {
 
 		// If start and end index does not present that means the dataref is single value dataref
 		if (!dataref.start_index.has_value() && !dataref.num_value.has_value()) {
 			if (dataref.type == "int") {
-				fbb.Int(dataref.name.c_str(), dataref::get_value_int(dataref.dataref));
+				flexbuffers_builder.Int(dataref.name.c_str(), get_value_int(dataref.dataref));
 			}
 			else if (dataref.type == "float") {
-				fbb.Float(dataref.name.c_str(), dataref::get_value_float(dataref.dataref));
+				flexbuffers_builder.Float(dataref.name.c_str(), get_value_float(dataref.dataref));
 			}
 			else if (dataref.type == "double") {
-				fbb.Double(dataref.name.c_str(), dataref::get_value_double(dataref.dataref));
+				flexbuffers_builder.Double(dataref.name.c_str(), get_value_double(dataref.dataref));
 			}
 		}
 		else {
-			auto vector_start = fbb.StartVector(dataref.name.c_str());
+			const auto vector_start = flexbuffers_builder.StartVector(dataref.name.c_str());
 			if (dataref.type == "int") {
-				for (auto int_num : dataref::get_value_int_array(dataref.dataref, dataref.start_index.value(), dataref.num_value.value())) {
-					fbb.Int(int_num);
+				for (auto int_num : get_value_int_array(dataref.dataref, dataref.start_index.value(), dataref.num_value.value())) {
+					flexbuffers_builder.Int(int_num);
 				}
 			}
 			else if (dataref.type == "float") {
-				for (auto float_num : dataref::get_value_float_array(dataref.dataref, dataref.start_index.value(), dataref.num_value.value())) {
-					fbb.Float(float_num);
+				for (auto float_num : get_value_float_array(dataref.dataref, dataref.start_index.value(), dataref.num_value.value())) {
+					flexbuffers_builder.Float(float_num);
 				}
 			}
 			else if (dataref.type == "char") {
-				auto str = dataref::get_value_char_array(dataref.dataref, dataref.start_index.value(), dataref.num_value.value());
-				fbb.String(std::string(str.begin(), str.end()));
+				auto str = get_value_char_array(dataref.dataref, dataref.start_index.value(), dataref.num_value.value());
+				flexbuffers_builder.String(std::string(str.begin(), str.end()));
 			}
-			fbb.EndVector(vector_start, false, false);
+			flexbuffers_builder.EndVector(vector_start, false, false);
 		}
 	}
 
-	fbb.EndMap(map_start);
-	fbb.Finish();
+	flexbuffers_builder.EndMap(map_start);
+	flexbuffers_builder.Finish();
 
-	return fbb.GetBuffer();
+	return flexbuffers_builder.GetBuffer();
 }
 
 bool dataref::get_status() {
 	return dataref::status;
 }
 
-void dataref::set_status(bool inStatus) {
-	dataref::status = inStatus;
+void dataref::set_status(bool in_status) {
+	dataref::status = in_status;
 }
 
-size_t dataref::get_serialized_size() {
-	return fbb.GetSize();
+size_t dataref::get_flexbuffers_size() {
+	return flexbuffers_builder.GetSize();
 }
 
 void dataref::initialize_list()
 {
-	auto input_file = cpptoml::parse_file("Datarefs.toml");
+	const auto input_file = cpptoml::parse_file("Datarefs.toml");
 
 	// Create a list of all the data table in the toml file
-	auto tarr = input_file->get_table_array("Data");
+	const auto tarr = input_file->get_table_array("Data");
 
 	// Loop through all the tables
 	for (const auto& table : *tarr)
 	{
-		// Construct a new struct to store each dataref data
-		XPLMDataRef new_dataref;
-		new_dataref = XPLMFindDataRef(table->get_as<std::string>("string").value_or("").c_str());
+		XPLMDataRef new_dataref = XPLMFindDataRef(table->get_as<std::string>("string").value_or("").c_str());
 
 		auto start = table->get_as<int>("start_index").value_or(-1);
 		auto num = table->get_as<int>("num_value").value_or(-1);
-		dataref::dataref_info temp_dataref_info;
+		dataref_info temp_dataref_info;
 
 		temp_dataref_info.name = table->get_as<std::string>("name").value_or("");
 		temp_dataref_info.dataref = new_dataref;
@@ -106,46 +124,46 @@ void dataref::initialize_list()
 	}
 }
 
-int dataref::get_value_int(XPLMDataRef inDataref)
+int dataref::get_value_int(XPLMDataRef in_dataref)
 {
-	return XPLMGetDatai(inDataref);
+	return XPLMGetDatai(in_dataref);
 }
 
-float dataref::get_value_float(XPLMDataRef inDataref) {
-	return XPLMGetDataf(inDataref);
+float dataref::get_value_float(XPLMDataRef in_dataref) {
+	return XPLMGetDataf(in_dataref);
 }
 
-double dataref::get_value_double(XPLMDataRef inDataref) {
-	return XPLMGetDatad(inDataref);
+double dataref::get_value_double(XPLMDataRef in_dataref) {
+	return XPLMGetDatad(in_dataref);
 }
 
-std::vector<int> dataref::get_value_int_array(XPLMDataRef inDataref, int start_index, int number_of_value) {
+std::vector<int> dataref::get_value_int_array(XPLMDataRef in_dataref, int start_index, int number_of_value) {
 	std::vector<int> return_val;
 	for (auto i = 1; i <= number_of_value; ++i) {
 		int temp;
-		XPLMGetDatavi(inDataref, &temp, start_index, 1);
+		XPLMGetDatavi(in_dataref, &temp, start_index, 1);
 		return_val.emplace_back(temp);
 	}
 	return return_val;
 }
 
-std::vector<float> dataref::get_value_float_array(XPLMDataRef inDataref, int start_index, int number_of_value) {
+std::vector<float> dataref::get_value_float_array(XPLMDataRef in_dataref, int start_index, int number_of_value) {
 	std::vector<float> return_val;
 
 	for (auto i = 1; i <= number_of_value; ++i) {
 		float temp;
-		XPLMGetDatavf(inDataref, &temp, start_index, 1);
+		XPLMGetDatavf(in_dataref, &temp, start_index, 1);
 		return_val.emplace_back(temp);
 	}
 	return return_val;
 }
 
-std::vector<char> dataref::get_value_char_array(XPLMDataRef inDataref, int start_index, int number_of_value) {
+std::vector<char> dataref::get_value_char_array(XPLMDataRef in_dataref, int start_index, int number_of_value) {
 	std::vector<char> return_val;
 
 	for (auto i = 1; i <= number_of_value; ++i) {
 		float temp;
-		XPLMGetDatab(inDataref, &temp, start_index, 1);
+		XPLMGetDatab(in_dataref, &temp, start_index, 1);
 		return_val.emplace_back(temp);
 	}
 	return return_val;

@@ -138,12 +138,14 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Boost_Socket.cpp" />
     <ClCompile Include="Datarefs.cpp" />
     <ClCompile Include="Ditto.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Boost_Socket.h" />
     <ClInclude Include="Datarefs.h" />
+    <ClInclude Include="Schema_generated.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Datarefs.toml" />

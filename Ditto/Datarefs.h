@@ -4,7 +4,9 @@
 #include <optional>
 #include "XPLMDataAccess.h"
 #include "XPLMUtilities.h"
+#include "flatbuffers/flatbuffers.h"
 #include "flatbuffers/flexbuffers.h"
+#include "Schema_generated.h"
 
 class dataref {
 private:
@@ -19,20 +21,23 @@ private:
 	std::vector<dataref_info> dataref_list;
 	std::vector<dataref_info> get_list();
 	void initialize_list();
-	int get_value_int(XPLMDataRef inDataref);
-	float get_value_float(XPLMDataRef inDataref);
-	double get_value_double(XPLMDataRef inDataref);
-	std::vector<int> get_value_int_array(XPLMDataRef inDataref, int start_index, int end_index);
-	std::vector<float> get_value_float_array(XPLMDataRef inDataref, int start_index, int end_index);
-	std::vector<char> get_value_char_array(XPLMDataRef inDataref, int start_index, int end_index);
-	flexbuffers::Builder fbb;
-	bool status;
+	int get_value_int(XPLMDataRef in_dataref);
+	float get_value_float(XPLMDataRef in_dataref);
+	double get_value_double(XPLMDataRef in_dataref);
+	std::vector<int> get_value_int_array(XPLMDataRef in_dataref, int start_index, int end_index);
+	std::vector<float> get_value_float_array(XPLMDataRef in_dataref, int start_index, int end_index);
+	std::vector<char> get_value_char_array(XPLMDataRef in_dataref, int start_index, int end_index);
+	std::vector<uint8_t> get_flexbuffers_data();
+	size_t get_flexbuffers_size();
+	flexbuffers::Builder flexbuffers_builder;
+	flatbuffers::FlatBufferBuilder flatbuffers_builder;
+	bool status{};
 public:
-	void set_status(bool inStatus);
+	uint8_t* get_serialized_data();
+	size_t get_serialized_size();
+	void set_status(bool in_status);
 	bool get_status();
-	std::vector<uint8_t> dataref::get_serialized_data();
-	size_t dataref::get_serialized_size();
-	void dataref::empty_list();
+	void empty_list();
 	void reset_builder();
 	void init();
 };
