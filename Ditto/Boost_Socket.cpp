@@ -16,8 +16,9 @@ void boost_socket::shutdown()
 // Initalize all the endpoints to send the data to. Then map then identification string
 // with an endpoint in a map.
 // The structure of the tuple is: [IP address] - [port number] - [ID string]
-size_t boost_socket::init_endpoint(std::vector<std::tuple<std::string, unsigned int, std::string>> in_vector)
+size_t boost_socket::init_endpoints()
 {
+	auto in_vector = get_endpoints();
 	for (auto& v : in_vector)
 	{
 		auto temp = udp::endpoint(boost::asio::ip::address::from_string(std::get<0>(v)).to_v4(), std::get<1>(v));
@@ -41,4 +42,25 @@ size_t boost_socket::send_data(char* send_buf, const int size, const std::string
 		XPLMDebugString("\n");
 		return 0;
 	}
+}
+
+std::vector<std::tuple<std::string, unsigned int, std::string>> boost_socket::get_endpoints()
+{
+	const auto input_file = cpptoml::parse_file("Datarefs.toml");
+
+	// Create a list of all the Endpoints table in the toml file
+	const auto endpoint_list = input_file->get_table_array("Endpoints");
+
+	std::vector<std::tuple<std::string, unsigned int, std::string>> addresses;
+
+	// Loop through all the tables
+	for (const auto& endpoint : *endpoint_list)
+	{
+		addresses.emplace_back(
+			endpoint->get_as<std::string>("address").value_or("127.0.0.1"),
+			endpoint->get_as<int>("port").value_or(6996),
+			endpoint->get_as<std::string>("name").value_or("Pylon")
+		);
+	}
+	return addresses;
 }

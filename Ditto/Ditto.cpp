@@ -6,7 +6,6 @@
 // https://github.com/google/flatbuffers/issues/5237
 // Solution: define NOMINMAX in preprocessor
 
-#include "Boost_Socket.h"
 #include "XPLMProcessing.h"
 #include "Datarefs.h"
 
@@ -29,16 +28,11 @@ PLUGIN_API int XPluginStart(
 	strcpy_s(outSig, 21, "phuong.x-plane.ditto");
 	strcpy_s(outDesc, 45, "A dataref extractor that can grow or shrink.");
 
-	std::vector<std::tuple<std::string, unsigned int, std::string>> addresses;
-	addresses.emplace_back("127.0.0.1", 6996, "Pylon");
-
-	io_context.run();
-
-	if (!new_socket.init_endpoint(addresses))
+	if (!new_socket.init_endpoints())
 	{
 		XPLMDebugString("Cannot init endpoints.\n");
-		return 0;
 	}
+	io_context.run();
 
 	new_data.init();
 
@@ -63,6 +57,7 @@ PLUGIN_API void XPluginDisable(void) {
 	XPLMUnregisterFlightLoopCallback(listenCallback, nullptr);
 	XPLMDebugString("Disabling Ditto.\n");
 }
+
 PLUGIN_API int  XPluginEnable(void) {
 	if (!new_data.get_status()) {
 		new_data.init();
@@ -71,6 +66,7 @@ PLUGIN_API int  XPluginEnable(void) {
 	XPLMDebugString("Enabling Ditto.\n");
 	return 1;
 }
+
 PLUGIN_API void XPluginReceiveMessage(XPLMPluginID inFrom, int inMsg, void* inParam) { }
 
 float listenCallback(float inElapsedSinceLastCall,

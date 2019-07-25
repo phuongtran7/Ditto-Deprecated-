@@ -7,6 +7,7 @@
 #include "flatbuffers/flatbuffers.h"
 #include "flatbuffers/flexbuffers.h"
 #include "Schema_generated.h"
+#include "Boost_Socket.h"
 
 class dataref {
 private:
@@ -18,9 +19,9 @@ private:
 		std::optional<int> num_value{}; // Number of values in the array to get starts at start_index
 	};
 
-	std::vector<dataref_info> dataref_list;
+	std::vector<dataref_info> dataref_list_;
 	std::vector<dataref_info> get_list();
-	void initialize_list();
+	void get_data_list();
 	int get_value_int(XPLMDataRef in_dataref);
 	float get_value_float(XPLMDataRef in_dataref);
 	double get_value_double(XPLMDataRef in_dataref);
@@ -29,9 +30,9 @@ private:
 	std::vector<char> get_value_char_array(XPLMDataRef in_dataref, int start_index, int end_index);
 	std::vector<uint8_t> get_flexbuffers_data();
 	size_t get_flexbuffers_size();
-	flexbuffers::Builder flexbuffers_builder;
-	flatbuffers::FlatBufferBuilder flatbuffers_builder;
-	bool status{};
+	flexbuffers::Builder flexbuffers_builder_;
+	flatbuffers::FlatBufferBuilder flatbuffers_builder_;
+	bool status_{};
 public:
 	uint8_t* get_serialized_data();
 	size_t get_serialized_size();
