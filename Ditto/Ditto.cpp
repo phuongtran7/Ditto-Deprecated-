@@ -53,6 +53,7 @@ PLUGIN_API void	XPluginStop(void)
 
 PLUGIN_API void XPluginDisable(void) {
 	new_data.empty_list();
+	new_socket.reset_endpoints();
 	XPLMUnregisterFlightLoopCallback(listenCallback, nullptr);
 	XPLMDebugString("Disabling Ditto.\n");
 }
@@ -60,6 +61,7 @@ PLUGIN_API void XPluginDisable(void) {
 PLUGIN_API int  XPluginEnable(void) {
 	if (!new_data.get_status()) {
 		new_data.init();
+		new_socket.init_endpoints();
 		XPLMRegisterFlightLoopCallback(listenCallback, -1.0, nullptr);
 	}
 	XPLMDebugString("Enabling Ditto.\n");

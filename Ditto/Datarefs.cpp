@@ -103,7 +103,7 @@ void dataref::get_data_list()
 	// Loop through all the tables
 	for (const auto& table : *data_list)
 	{
-		const XPLMDataRef new_dataref = XPLMFindDataRef(table->get_as<std::string>("string").value_or("").c_str());
+		XPLMDataRef new_dataref = XPLMFindDataRef(table->get_as<std::string>("string").value_or("").c_str());
 
 		auto start = table->get_as<int>("start_index").value_or(-1);
 		auto num = table->get_as<int>("num_value").value_or(-1);

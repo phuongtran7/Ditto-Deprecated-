@@ -26,6 +26,11 @@ size_t boost_socket::init_endpoints()
 	return endpoints_.size();
 }
 
+void boost_socket::reset_endpoints()
+{
+	endpoints_.clear();
+}
+
 // Send the data to the endpoint that matches the referenced ID string
 size_t boost_socket::send_data(char* send_buf, const int size, const std::string& endpoint)
 {
