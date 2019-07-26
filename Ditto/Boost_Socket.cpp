@@ -32,7 +32,7 @@ void boost_socket::reset_endpoints()
 }
 
 // Send the data to the endpoint that matches the referenced ID string
-size_t boost_socket::send_data(char* send_buf, const int size, const std::string& endpoint)
+size_t boost_socket::send_data(char* send_buf, size_t size, const std::string& endpoint)
 {
 	try
 	{
@@ -49,7 +49,7 @@ size_t boost_socket::send_data(char* send_buf, const int size, const std::string
 }
 
 // Send the data to all endpoints
-void boost_socket::send_data(char* send_buf, const int size)
+void boost_socket::send_data(char* send_buf, size_t size)
 {
 	for (const auto& endpoint : endpoints_)
 	{
@@ -66,23 +66,35 @@ void boost_socket::send_data(char* send_buf, const int size)
 	}
 }
 
+void boost_socket::set_plugin_path(const std::string& path)
+{
+	plugin_path_ = path;
+}
+
 std::vector<std::tuple<std::string, unsigned int, std::string>> boost_socket::get_endpoints()
 {
-	const auto input_file = cpptoml::parse_file("Datarefs.toml");
+	try {
+		const auto input_file = cpptoml::parse_file(plugin_path_ + "Datarefs.toml");
 
-	// Create a list of all the Endpoints table in the toml file
-	const auto endpoint_list = input_file->get_table_array("Endpoints");
+		// Create a list of all the Endpoints table in the toml file
+		const auto endpoint_list = input_file->get_table_array("Endpoints");
 
-	std::vector<std::tuple<std::string, unsigned int, std::string>> addresses;
+		std::vector<std::tuple<std::string, unsigned int, std::string>> addresses;
 
-	// Loop through all the tables
-	for (const auto& endpoint : *endpoint_list)
-	{
-		addresses.emplace_back(
-			endpoint->get_as<std::string>("address").value_or("127.0.0.1"),
-			endpoint->get_as<int>("port").value_or(6996),
-			endpoint->get_as<std::string>("name").value_or("Pylon")
-		);
+		// Loop through all the tables
+		for (const auto& endpoint : *endpoint_list)
+		{
+			addresses.emplace_back(
+				endpoint->get_as<std::string>("address").value_or("127.0.0.1"),
+				endpoint->get_as<int>("port").value_or(6996),
+				endpoint->get_as<std::string>("name").value_or("Pylon")
+			);
+		}
+
+		return addresses;
 	}
-	return addresses;
+	catch (const cpptoml::parse_exception& ex)
+	{
+		XPLMDebugString(ex.what());
+	}
 }

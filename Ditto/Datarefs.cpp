@@ -95,33 +95,39 @@ size_t dataref::get_flexbuffers_size() {
 
 void dataref::get_data_list()
 {
-	const auto input_file = cpptoml::parse_file("Datarefs.toml");
-
-	// Create a list of all the Data table in the toml file
-	const auto data_list = input_file->get_table_array("Data");
-
-	// Loop through all the tables
-	for (const auto& table : *data_list)
+	try
 	{
-		XPLMDataRef new_dataref = XPLMFindDataRef(table->get_as<std::string>("string").value_or("").c_str());
+		const auto input_file = cpptoml::parse_file(plugin_path_ + "Datarefs.toml");
+		// Create a list of all the Data table in the toml file
+		const auto data_list = input_file->get_table_array("Data");
 
-		auto start = table->get_as<int>("start_index").value_or(-1);
-		auto num = table->get_as<int>("num_value").value_or(-1);
-		dataref_info temp_dataref_info;
+		// Loop through all the tables
+		for (const auto& table : *data_list)
+		{
+			XPLMDataRef new_dataref = XPLMFindDataRef(table->get_as<std::string>("string").value_or("").c_str());
 
-		temp_dataref_info.name = table->get_as<std::string>("name").value_or("");
-		temp_dataref_info.dataref = new_dataref;
-		temp_dataref_info.type = table->get_as<std::string>("type").value_or("");
+			auto start = table->get_as<int>("start_index").value_or(-1);
+			auto num = table->get_as<int>("num_value").value_or(-1);
+			dataref_info temp_dataref_info;
 
-		if (start != -1 && num != -1) {
-			temp_dataref_info.start_index = start;
-			temp_dataref_info.num_value = num;
+			temp_dataref_info.name = table->get_as<std::string>("name").value_or("");
+			temp_dataref_info.dataref = new_dataref;
+			temp_dataref_info.type = table->get_as<std::string>("type").value_or("");
+
+			if (start != -1 && num != -1) {
+				temp_dataref_info.start_index = start;
+				temp_dataref_info.num_value = num;
+			}
+			else {
+				temp_dataref_info.start_index = std::nullopt;
+				temp_dataref_info.num_value = std::nullopt;
+			}
+			dataref_list_.emplace_back(temp_dataref_info);
 		}
-		else {
-			temp_dataref_info.start_index = std::nullopt;
-			temp_dataref_info.num_value = std::nullopt;
-		}
-		dataref_list_.emplace_back(temp_dataref_info);
+	}
+	catch (const cpptoml::parse_exception& ex)
+	{
+		XPLMDebugString(ex.what());
 	}
 }
 
@@ -173,4 +179,9 @@ std::vector<char> dataref::get_value_char_array(XPLMDataRef in_dataref, int star
 void dataref::init() {
 	get_data_list();
 	set_status(true);
+}
+
+void dataref::set_plugin_path(const std::string& path)
+{
+	plugin_path_ = path;
 }

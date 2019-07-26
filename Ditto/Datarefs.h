@@ -8,6 +8,7 @@
 #include "flatbuffers/flexbuffers.h"
 #include "Schema_generated.h"
 #include "XPLMProcessing.h"
+#include "XPLMPlugin.h"
 
 class dataref {
 private:
@@ -30,6 +31,7 @@ private:
 	std::vector<char> get_value_char_array(XPLMDataRef in_dataref, int start_index, int end_index);
 	std::vector<uint8_t> get_flexbuffers_data();
 	size_t get_flexbuffers_size();
+	std::string plugin_path_{};
 	flexbuffers::Builder flexbuffers_builder_;
 	flatbuffers::FlatBufferBuilder flatbuffers_builder_;
 	bool status_{};
@@ -41,4 +43,5 @@ public:
 	void empty_list();
 	void reset_builder();
 	void init();
+	void set_plugin_path(const std::string& path);
 };

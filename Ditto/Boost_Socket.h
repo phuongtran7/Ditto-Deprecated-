@@ -12,9 +12,11 @@ public:
 	void shutdown();
 	size_t init_endpoints();
 	void reset_endpoints();
-	size_t send_data(char* send_buf, const int size, const std::string& endpoint);
-	void send_data(char* send_buf, const int size);
+	size_t send_data(char* send_buf, size_t size, const std::string& endpoint);
+	void send_data(char* send_buf, size_t size);
+	void set_plugin_path(const std::string& path);
 private:
+	std::string plugin_path_{};
 	std::map<std::string, udp::endpoint> endpoints_;
 	udp::socket socket_;
 	std::vector<std::tuple<std::string, unsigned int, std::string>> get_endpoints();
