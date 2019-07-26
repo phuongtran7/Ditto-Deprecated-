@@ -6,7 +6,6 @@
 // https://github.com/google/flatbuffers/issues/5237
 // Solution: define NOMINMAX in preprocessor
 
-#include "XPLMProcessing.h"
 #include "Datarefs.h"
 
 boost::asio::io_context io_context;

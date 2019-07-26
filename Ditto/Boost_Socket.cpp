@@ -1,5 +1,4 @@
 #include "Boost_Socket.h"
-#include <XPLMUtilities.h>
 
 boost_socket::boost_socket(boost::asio::io_context& io_context)
 	: socket_(io_context)
@@ -41,6 +40,24 @@ size_t boost_socket::send_data(char* send_buf, const int size, const std::string
 		XPLMDebugString(e.what());
 		XPLMDebugString("\n");
 		return 0;
+	}
+}
+
+// Send the data to all endpoints
+void boost_socket::send_data(char* send_buf, const int size)
+{
+	for (const auto& endpoint : endpoints_)
+	{
+		try
+		{
+			const auto retval = socket_.send_to(boost::asio::buffer(send_buf, size), endpoint.second);
+		}
+		catch (boost::system::system_error& e)
+		{
+			XPLMDebugString(("Send data to " + endpoint.first + " failed with error: ").c_str());
+			XPLMDebugString(e.what());
+			XPLMDebugString("\n");
+		}
 	}
 }
 

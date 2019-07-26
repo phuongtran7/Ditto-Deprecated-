@@ -1,5 +1,5 @@
 #pragma once
-#include "cpptoml.h"
+#include "Boost_Socket.h"
 #include <vector>
 #include <optional>
 #include "XPLMDataAccess.h"
@@ -7,7 +7,7 @@
 #include "flatbuffers/flatbuffers.h"
 #include "flatbuffers/flexbuffers.h"
 #include "Schema_generated.h"
-#include "Boost_Socket.h"
+#include "XPLMProcessing.h"
 
 class dataref {
 private:

@@ -1,6 +1,7 @@
 #pragma once
 #include <boost/asio.hpp>
 #include <cpptoml.h>
+#include <XPLMUtilities.h>
 
 using boost::asio::ip::udp;
 
@@ -11,7 +12,7 @@ public:
 	void shutdown();
 	size_t init_endpoints();
 	size_t send_data(char* send_buf, const int size, const std::string& endpoint);
-
+	void send_data(char* send_buf, const int size);
 private:
 	udp::socket socket_;
 	std::map<std::string, udp::endpoint> endpoints_;
