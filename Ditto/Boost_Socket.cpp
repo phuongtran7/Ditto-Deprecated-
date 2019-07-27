@@ -28,6 +28,9 @@ size_t boost_socket::init_endpoints()
 }
 
 bool boost_socket::enable_socket() {
+	if (io_context.stopped()) {
+		io_context.restart();
+	}
 	io_context.run();
 	if (init_endpoints()) {
 		return true;
@@ -39,7 +42,6 @@ void boost_socket::disable_socket()
 {
 	io_context.stop();
 	endpoints_.clear();
-	io_context.restart();
 }
 
 // Send the data to the endpoint that matches the referenced ID string
