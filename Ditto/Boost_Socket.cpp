@@ -1,10 +1,11 @@
 #include "Boost_Socket.h"
 
-boost_socket::boost_socket(boost::asio::io_context& io_context)
-	: socket_(io_context)
+boost_socket::boost_socket()
+	: io_context(), socket_(io_context)
 {
 	socket_.open(udp::v4());
 }
+
 
 void boost_socket::shutdown()
 {
@@ -26,9 +27,19 @@ size_t boost_socket::init_endpoints()
 	return endpoints_.size();
 }
 
-void boost_socket::reset_endpoints()
+bool boost_socket::enable_socket() {
+	io_context.run();
+	if (init_endpoints()) {
+		return true;
+	}
+	return false;
+}
+
+void boost_socket::disable_socket()
 {
+	io_context.stop();
 	endpoints_.clear();
+	io_context.restart();
 }
 
 // Send the data to the endpoint that matches the referenced ID string
@@ -73,13 +84,12 @@ void boost_socket::set_plugin_path(const std::string& path)
 
 std::vector<std::tuple<std::string, unsigned int, std::string>> boost_socket::get_endpoints()
 {
+	std::vector<std::tuple<std::string, unsigned int, std::string>> addresses{};
 	try {
 		const auto input_file = cpptoml::parse_file(plugin_path_ + "Datarefs.toml");
 
 		// Create a list of all the Endpoints table in the toml file
 		const auto endpoint_list = input_file->get_table_array("Endpoints");
-
-		std::vector<std::tuple<std::string, unsigned int, std::string>> addresses;
 
 		// Loop through all the tables
 		for (const auto& endpoint : *endpoint_list)
@@ -90,11 +100,11 @@ std::vector<std::tuple<std::string, unsigned int, std::string>> boost_socket::ge
 				endpoint->get_as<std::string>("name").value_or("Pylon")
 			);
 		}
-
-		return addresses;
 	}
 	catch (const cpptoml::parse_exception& ex)
 	{
 		XPLMDebugString(ex.what());
 	}
+
+	return addresses;
 }

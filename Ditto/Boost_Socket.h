@@ -8,16 +8,18 @@ using boost::asio::ip::udp;
 class boost_socket
 {
 public:
-	explicit boost_socket(boost::asio::io_context& io_context);
+	explicit boost_socket();
 	void shutdown();
-	size_t init_endpoints();
-	void reset_endpoints();
+	void disable_socket();
+	bool enable_socket();
 	size_t send_data(char* send_buf, size_t size, const std::string& endpoint);
 	void send_data(char* send_buf, size_t size);
 	void set_plugin_path(const std::string& path);
 private:
+	size_t init_endpoints();
 	std::string plugin_path_{};
 	std::map<std::string, udp::endpoint> endpoints_;
 	udp::socket socket_;
 	std::vector<std::tuple<std::string, unsigned int, std::string>> get_endpoints();
+	boost::asio::io_context io_context;
 };

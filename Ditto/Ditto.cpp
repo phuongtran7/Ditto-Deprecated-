@@ -1,15 +1,6 @@
-// Used to disable warning when compiling with C++17.
-// More info: https://github.com/boostorg/asio/issues/109
-#define  _SILENCE_CXX17_ALLOCATOR_VOID_DEPRECATION_WARNING
-
-// More info about ulti.h error
-// https://github.com/google/flatbuffers/issues/5237
-// Solution: define NOMINMAX in preprocessor
-
 #include "Datarefs.h"
 
-boost::asio::io_context io_context;
-boost_socket new_socket(io_context);
+boost_socket new_socket;
 dataref new_data;
 
 static float	listenCallback(
@@ -45,8 +36,6 @@ PLUGIN_API int XPluginStart(
 
 	XPLMDebugString("Starting Ditto.\n");
 
-	io_context.run();
-
 	//Register to get callback every frame
 	XPLMRegisterFlightLoopCallback(listenCallback, -1.0, nullptr);
 
@@ -55,7 +44,6 @@ PLUGIN_API int XPluginStart(
 
 PLUGIN_API void	XPluginStop(void)
 {
-	/* Unregister the callback */
 	new_data.empty_list();
 	XPLMUnregisterFlightLoopCallback(listenCallback, nullptr);
 	new_socket.shutdown();
@@ -64,12 +52,12 @@ PLUGIN_API void	XPluginStop(void)
 
 PLUGIN_API void XPluginDisable(void) {
 	new_data.empty_list();
-	new_socket.reset_endpoints();
+	new_socket.disable_socket();
 	XPLMUnregisterFlightLoopCallback(listenCallback, nullptr);
 	XPLMDebugString("Disabling Ditto.\n");
 }
 
-PLUGIN_API int  XPluginEnable(void) {
+PLUGIN_API int XPluginEnable(void) {
 	if (!new_data.get_status()) {
 
 		const auto path = get_plugin_path();
@@ -78,7 +66,7 @@ PLUGIN_API int  XPluginEnable(void) {
 		new_socket.set_plugin_path(path);
 
 		new_data.init();
-		if (!new_socket.init_endpoints())
+		if (!new_socket.enable_socket())
 		{
 			XPLMDebugString("Cannot init endpoints.\n");
 			return 0; // Disable the plugin as it cannot init endpoint.
