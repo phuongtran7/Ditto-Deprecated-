@@ -1,7 +1,7 @@
 #include "Boost_Socket.h"
 
-boost_socket::boost_socket()
-	: io_context(), socket_(io_context)
+boost_socket::boost_socket(boost::asio::io_context& io_context)
+	: socket_(io_context)
 {
 	socket_.open(udp::v4());
 }
@@ -28,19 +28,11 @@ size_t boost_socket::init_endpoints()
 }
 
 bool boost_socket::enable_socket() {
-	if (io_context.stopped()) {
-		io_context.restart();
-	}
-	io_context.run();
-	if (init_endpoints()) {
-		return true;
-	}
-	return false;
+	return init_endpoints() != 0;
 }
 
 void boost_socket::disable_socket()
 {
-	io_context.stop();
 	endpoints_.clear();
 }
 

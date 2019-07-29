@@ -8,7 +8,7 @@ using boost::asio::ip::udp;
 class boost_socket
 {
 public:
-	explicit boost_socket();
+	explicit boost_socket(boost::asio::io_context& io_context);
 	void shutdown();
 	void disable_socket();
 	bool enable_socket();
@@ -21,5 +21,4 @@ private:
 	std::map<std::string, udp::endpoint> endpoints_;
 	udp::socket socket_;
 	std::vector<std::tuple<std::string, unsigned int, std::string>> get_endpoints();
-	boost::asio::io_context io_context;
 };

@@ -1,6 +1,8 @@
 #include "Datarefs.h"
 
-boost_socket new_socket;
+boost::asio::io_context io_context;
+
+boost_socket new_socket(io_context);
 dataref new_data;
 
 static float	listenCallback(
@@ -36,6 +38,8 @@ PLUGIN_API int XPluginStart(
 
 	XPLMDebugString("Starting Ditto.\n");
 
+	io_context.run();
+
 	//Register to get callback every frame
 	XPLMRegisterFlightLoopCallback(listenCallback, -1.0, nullptr);
 
@@ -47,11 +51,13 @@ PLUGIN_API void	XPluginStop(void)
 	new_data.empty_list();
 	XPLMUnregisterFlightLoopCallback(listenCallback, nullptr);
 	new_socket.shutdown();
+	io_context.stop();
 	XPLMDebugString("Stopping Ditto.\n");
 }
 
 PLUGIN_API void XPluginDisable(void) {
 	new_data.empty_list();
+	io_context.stop();
 	new_socket.disable_socket();
 	XPLMUnregisterFlightLoopCallback(listenCallback, nullptr);
 	XPLMDebugString("Disabling Ditto.\n");
@@ -60,6 +66,10 @@ PLUGIN_API void XPluginDisable(void) {
 PLUGIN_API int XPluginEnable(void) {
 	if (!new_data.get_status()) {
 
+		if (io_context.stopped())
+		{
+			io_context.restart();
+		}
 		const auto path = get_plugin_path();
 
 		new_data.set_plugin_path(path);
