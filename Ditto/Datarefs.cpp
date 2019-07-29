@@ -169,7 +169,7 @@ std::vector<char> dataref::get_value_char_array(XPLMDataRef in_dataref, int star
 	std::vector<char> return_val;
 
 	for (auto i = 1; i <= number_of_value; ++i) {
-		float temp;
+		char temp;
 		XPLMGetDatab(in_dataref, &temp, start_index, 1);
 		return_val.emplace_back(temp);
 	}
